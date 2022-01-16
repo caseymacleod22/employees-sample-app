@@ -1,5 +1,4 @@
 import { makeServer } from "./server";
-import { EmployeeTable } from "./components/EmployeeTable";
 import { useEffect, useState } from "react";
 
 if (process.env.NODE_ENV === "development") {
@@ -7,28 +6,42 @@ if (process.env.NODE_ENV === "development") {
 }
 
 function App() {
-  let [employees, setEmployees] = useState([])
+  const [employees, setEmployees] = useState([])
 
   useEffect(() => {
-    fetch("api/employees")
-    .then((res) => res.json())
-    .then((json) => {
-      setEmployees(json.employees)
-    })
+    fetch('/api/employees')
+    .then(res => res.json())
+    .then(json => setEmployees(json.employees)
+    )
   }, [])
   return (
     <div>
       <header>
         <h1>Employees</h1>
-        <EmployeeTable />
       </header>
-      <ul>
-        {employees.map((employee) => {
-          <li key={employee.id}>{employee.firstName}</li>
-          console.log(employee.firstName)
-        })}
-      </ul>
-    </div>
+      {employees.length > 0 ? (
+        <table>
+          <thead>
+            <tr>
+              <th>first name</th>
+              <th>last name</th>
+            </tr>
+          </thead>
+          <tbody>
+            {employees.map(({id, firstName, lastName}) => {
+              return(
+              <tr key={id}>
+                <td>{firstName}</td>
+                <td>{lastName}</td>
+              </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      ) : (
+        <p>No employees</p>
+        )}
+  </div>
   );
 }
 export default App;
