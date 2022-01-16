@@ -32,7 +32,7 @@ function App() {
               return(
               <tr key={id}>
                 <td>{firstName}</td>
-                {/* <td>{lastName}</td> */}
+                <td>{lastName}</td>
               </tr>
               )
             })}
