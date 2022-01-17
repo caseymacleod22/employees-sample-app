@@ -6,6 +6,11 @@ import { EmployeeForm } from "./EmployeeForm"
 //This function fetches the server.js data and maps over the first and last name of the employees
 export function EmployeeTable() {
     const [employees, setEmployees] = useState([])
+    const [employeeId, setEmployeeId] = useState([])
+    const [update, setUpdate] = useState(false)
+
+    const [firstName, setFirstName] = useState('')
+    const [lastName, setLastName] = useState('')
 
     const deleteEmployee = async (id) => {
         try {
@@ -14,6 +19,32 @@ export function EmployeeTable() {
         } catch (error) {
             
         }
+    }
+
+
+    const submitForm = async (event) => {
+        event.preventDefault()
+
+        try {
+            const res = await fetch('/api/employees', 
+            {method: 'POST', body: JSON.stringify({firstName, lastName})})
+            const json = await res.json()
+
+            setEmployees([...employees, json.employee])
+            setFirstName('')
+            setLastName('')
+        } catch (error) {
+            console.log('Something went wrong')
+        }
+    }
+
+    const setEmployeeToUpdate = (id) => {
+        const employee = employees.find(emp => emp.id === id)
+        if(!employee) return
+        setUpdate(true)
+        setEmployeeId(employee.id)
+        setFirstName(employee.firstName)
+        setLastName(employee.lastName)
     }
 
     useEffect(() => {
@@ -43,6 +74,7 @@ export function EmployeeTable() {
                     <td>{firstName}</td>
                     <td>{lastName}</td>
                     <td>
+                        <button onClick={() => setEmployeeToUpdate(id)}>UPDATE</button>
                         <button onClick={() => deleteEmployee(id)}>DELETE</button>
                     </td>
                   </tr>
@@ -54,7 +86,19 @@ export function EmployeeTable() {
               // If for some reason the employees cannot be returned the page will render this p tag.
             <p>No employees</p>
             )}
-        <EmployeeForm />
+                <form onSubmit={submitForm}>
+            <div>
+                <div>
+                    <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)}/>
+                </div>
+                <div>
+                <input type="text" value={lastName} onChange={e => setLastName(e.target.value)}/>
+                </div>
+                <div>
+                    <button type='submit'>{update ? 'Update' : 'Create'}</button>
+                </div>
+            </div>
+        </form>
       </div>
       );
 }
