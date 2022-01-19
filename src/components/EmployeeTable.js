@@ -80,15 +80,8 @@ const deleteEmployee = async (id) => {
             <h1>Employees</h1>
           </header>
             <table>
-              <thead>
-                <tr>
-                  {/* <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>Actions</th> */}
-                </tr>
-              </thead>
               <tbody>
-                {employees.filter(item => item).map(({id, firstName, lastName, email, phone, bio}) => {
+                {employees.filter(item => item).map(({id, firstName, lastName, email, phone, bio, avatar}) => {
                   return(
                   <tr key={id}>
                     <td>{firstName}</td><br /><br />
@@ -100,6 +93,8 @@ const deleteEmployee = async (id) => {
                           <td>{email}</td><br /><br />
                           <td>{phone}</td><br /><br />
                           <td>{bio}</td><br /><br />
+                          <img src={avatar} alt="avatar" style={{height: '60px', width:'100px'}}/>
+                          {/* <td>{address}</td><br /><br /> */}
                           </tr>
                         </thead>
                       </table>
