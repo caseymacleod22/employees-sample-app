@@ -115,30 +115,6 @@ const deleteEmployee = async (id) => {
                 })}
               </tbody>
             </table>
-            {expand === true ? (
-              <table>
-                <thead>
-                  <tr>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Bio</th>
-                  </tr>
-                </thead>
-                <tbody>
-                {employees.filter(item => item).map(({id, email, phone, bio}) => {
-                  return(
-                  <tr key={id}>
-                    <td>{email}</td>
-                    <td>{phone}</td>
-                    <td>{bio}</td>
-                  </tr>
-                  )
-                })}
-                </tbody>
-              </table>
-            ) : (
-              <p></p>
-            )}
                 <form onSubmit={submitForm}>
             <div>
                 <div>
@@ -149,7 +125,7 @@ const deleteEmployee = async (id) => {
                 </div>
                 <div>
                     <button type='submit'>{update ? 'Update' : 'Create'}</button>
-                    <button onClick={() => expandAllEmployees()}>EXPAND ALL</button>
+                    <button onClick={() => expandAllEmployees()}>{expand ? 'COLLAPSE ALL' : 'EXPAND ALL'}</button>
                 </div>
             </div>
         </form>
