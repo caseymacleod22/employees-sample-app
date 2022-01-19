@@ -1,43 +1,70 @@
-import { makeServer } from "../server"
 import { useState, useEffect } from "react"
-import { EmployeeForm } from "./EmployeeForm"
+// import { EmployeeForm } from "./EmployeeForm"
 
 
-//This function fetches the server.js data and maps over the first and last name of the employees
 export function EmployeeTable() {
     const [employees, setEmployees] = useState([])
     const [employeeId, setEmployeeId] = useState([])
     const [update, setUpdate] = useState(false)
+    const [expand, setExpand] = useState(false)
 
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
 
-    const deleteEmployee = async (id) => {
-        try {
-            await fetch(`/api/employees/${id}`, {method: 'DELETE'})
-            setEmployees(employees.filter(employee => employee.id !== id))
-        } catch (error) {
-            
-        }
+    useEffect(() => {
+      fetch('/api/employees')
+      .then(res => res.json())
+      .then(json => setEmployees(json.employees)
+      )
+      console.log(expand)
+    }, [])
+
+    const expandAllEmployees = (id, firstName, lastName, email) => {
+      if(expand === false) {
+        setExpand(true)
+      } if(expand === true) {
+        setExpand(false)
+      }
+      console.log(expand)
     }
 
+    const updateEmployee = async () => {
+      try {
+      const res = await fetch(`/api/employees/${employeeId}`, 
+      {method: 'PATCH', body: JSON.stringify({firstName, lastName})})
+      const json = await res.json()
 
-    const submitForm = async (event) => {
-        event.preventDefault()
+      const employeesCopy = [...employees]
+      const index = employees.findIndex((employee) => employee.id === employeeId)
+      employeesCopy[index] = json.employee
 
-        try {
-            const res = await fetch('/api/employees', 
-            {method: 'POST', body: JSON.stringify({firstName, lastName})})
-            const json = await res.json()
+      setEmployees(employeesCopy)
+      setFirstName('')
+      setLastName('')
+      setUpdate(false)
+      setEmployeeId(null)
+  } catch (err) {
+      console.log(err)
+  }
+}
 
-            setEmployees([...employees, json.employee])
-            setFirstName('')
-            setLastName('')
-        } catch (error) {
-            console.log('Something went wrong')
-        }
-    }
+const submitForm = async (event) => {
+  event.preventDefault()
 
+  if(update){
+      updateEmployee()
+  }
+}
+    
+  
+const deleteEmployee = async (id) => {
+  try {
+      await fetch(`/api/employees/${id}`, {method: 'DELETE'})
+      setEmployees(employees.filter(employee => employee.id !== id))
+  } catch (error) {
+      
+  }
+}
     const setEmployeeToUpdate = (id) => {
         const employee = employees.find(emp => emp.id === id)
         if(!employee) return
@@ -47,44 +74,70 @@ export function EmployeeTable() {
         setLastName(employee.lastName)
     }
 
-    useEffect(() => {
-      fetch('/api/employees')
-      .then(res => res.json())
-      .then(json => setEmployees(json.employees)
-      )
-    }, [])
     return (
         <div>
           <header>
             <h1>Employees</h1>
           </header>
-          {employees.length > 0 ? (
             <table>
               <thead>
                 <tr>
-                  <th>First Name</th>
+                  {/* <th>First Name</th>
                   <th>Last Name</th>
-                  <th>Actions</th>
+                  <th>Actions</th> */}
                 </tr>
               </thead>
               <tbody>
-                {employees.map(({id, firstName, lastName}) => {
+                {employees.filter(item => item).map(({id, firstName, lastName, email, phone, bio}) => {
                   return(
                   <tr key={id}>
-                    <td>{firstName}</td>
-                    <td>{lastName}</td>
+                    <td>{firstName}</td><br /><br />
+                    <td>{lastName}</td><br /><br />
+                    {expand === true ? (
+                      <table>
+                        <thead>
+                          <tr>
+                          <td>{email}</td><br /><br />
+                          <td>{phone}</td><br /><br />
+                          <td>{bio}</td><br /><br />
+                          </tr>
+                        </thead>
+                      </table>
+                    ) : (
+                      <th></th>
+                    )}
                     <td>
                         <button onClick={() => setEmployeeToUpdate(id)}>UPDATE</button>
-                        <button onClick={() => deleteEmployee(id)}>DELETE</button>
+                        <button onClick={() => deleteEmployee(id)}>DELETE</button>                  
                     </td>
                   </tr>
                   )
                 })}
               </tbody>
             </table>
-          ) : (
-              // If for some reason the employees cannot be returned the page will render this p tag.
-            <p>No employees</p>
+            {expand === true ? (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Bio</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {employees.filter(item => item).map(({id, email, phone, bio}) => {
+                  return(
+                  <tr key={id}>
+                    <td>{email}</td>
+                    <td>{phone}</td>
+                    <td>{bio}</td>
+                  </tr>
+                  )
+                })}
+                </tbody>
+              </table>
+            ) : (
+              <p></p>
             )}
                 <form onSubmit={submitForm}>
             <div>
@@ -96,9 +149,10 @@ export function EmployeeTable() {
                 </div>
                 <div>
                     <button type='submit'>{update ? 'Update' : 'Create'}</button>
+                    <button onClick={() => expandAllEmployees()}>EXPAND ALL</button>
                 </div>
             </div>
         </form>
       </div>
-      );
+      )
 }
