@@ -51,22 +51,14 @@ const submitForm = async (event) => {
     }
 }
 
-const setEmployeeToUpdate = (id) => {
-    const employee = employees.find(emp => emp.id === id)
-    if(!employee) return
-    setUpdate(true)
-    setEmployeeId(employee.id)
-    setFirstName(employee.firstName)
-    setLastName(employee.lastName)
-}
     return (
         <form onSubmit={submitForm}>
             <div>
                 <div>
-                    <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)}/>
+                    <input type="text" placeholder={} value={firstName} onChange={e => setFirstName(e.target.value)}/>
                 </div>
                 <div>
-                <input type="text" value={lastName} onChange={e => setLastName(e.target.value)}/>
+                <input type="text" placeholder="Last Name" value={lastName} onChange={e => setLastName(e.target.value)} />
                 </div>
                 <div>
                     <button type='submit'>{update ? 'Update' : 'Create'}</button>

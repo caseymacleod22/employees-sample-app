@@ -1,6 +1,18 @@
+import Modal from "react-modal/lib/components/Modal"
 import { useState, useEffect } from "react"
+import React from "react"
 // import { EmployeeForm } from "./EmployeeForm"
 
+const customStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+  },
+};
 
 export function EmployeeTable() {
     const [employees, setEmployees] = useState([])
@@ -10,16 +22,33 @@ export function EmployeeTable() {
 
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
+    const [info, setInfo] = useState('')
 
     useEffect(() => {
       fetch('/api/employees')
       .then(res => res.json())
       .then(json => setEmployees(json.employees)
       )
-      console.log(expand)
+      // console.log(expand)
     }, [])
 
-    const expandAllEmployees = (id, firstName, lastName, email) => {
+    let subtitle;
+    const [modalIsOpen, setIsOpen] = React.useState(false);
+  
+    function openModal() {
+      setIsOpen(true);
+    }
+  
+    function afterOpenModal() {
+      // references are now sync'd and can be accessed.
+      subtitle.style.color = '#f00';
+    }
+  
+    function closeModal() {
+      setIsOpen(false);
+    }
+
+    const expandAllEmployees = () => {
       if(expand === false) {
         setExpand(true)
       } if(expand === true) {
@@ -74,36 +103,78 @@ const deleteEmployee = async (id) => {
         setLastName(employee.lastName)
     }
 
+    const moreInfo = async(id) => {
+      try {
+        openModal(true)
+        const res = await fetch(`/api/employees/${id}`)
+        const json = await res.json
+         setInfo(json.info) 
+
+      } catch (error) {
+        
+      }
+    }
+
     return (
         <div>
-          <header>
-            <h1>Employees</h1>
-          </header>
+        <div>
+        </div>
+        <div>
+      <Modal
+        isOpen={modalIsOpen}
+        onAfterOpen={afterOpenModal}
+        onRequestClose={closeModal}
+        style={customStyles}
+        contentLabel="Example Modal"
+      >
+        <h2 ref={(_subtitle) => (subtitle = _subtitle)}>More Info</h2>
+        <button onClick={closeModal}>close</button>
+        {employees.slice(0, 1).map(info => (
+          <>
+          <p>{info.firstName}</p>
+          <p>{info.lastName}</p>
+          <p>{info.email}</p>
+          <p>{info.phone}</p>
+          <p>{info.address.streetAddress}, {info.address.city} {info.address.state} {info.address.zipCode}</p>
+          <p>{info.bio}</p>
+          </>
+        ))}
+      </Modal>
+    </div>
             <table>
               <tbody>
-                {employees.filter(item => item).map(({id, firstName, lastName, email, phone, bio, avatar}) => {
+              <tr>
+                <td>
+                  <button onClick={() => expandAllEmployees()}>{expand ? 'COLLAPSE ALL' : 'EXPAND ALL'}
+                </button>
+                </td>
+              </tr>
+                {employees.filter(item => item).map(({id, avatar, firstName, lastName, email, phone, bio, address}) => {
                   return(
-                  <tr key={id}>
-                    <td>{firstName}</td><br /><br />
-                    <td>{lastName}</td><br /><br />
+                    <tr key={id}>
+                    <td><img src={avatar} alt="avatar" style={{height: '60px', width:'100px'}}/></td>
+                    <td>{firstName}</td>
+                    <td>{lastName}</td>
                     {expand === true ? (
                       <table>
                         <thead>
                           <tr>
-                          <td>{email}</td><br /><br />
-                          <td>{phone}</td><br /><br />
-                          <td>{bio}</td><br /><br />
-                          <img src={avatar} alt="avatar" style={{height: '60px', width:'100px'}}/>
-                          {/* <td>{address}</td><br /><br /> */}
+                          <td>{email}</td>
+                          <td>{phone}</td>
+                          <td>{address.streetAddress}</td>
+                          <td>{address.city}, {address.state} {address.zipCode}</td>
+                          <td>{bio}</td>  
+                          {console.log(email)}                  
                           </tr>
                         </thead>
                       </table>
-                    ) : (
+                      ) : (
                       <th></th>
                     )}
                     <td>
-                        <button onClick={() => setEmployeeToUpdate(id)}>UPDATE</button>
-                        <button onClick={() => deleteEmployee(id)}>DELETE</button>                  
+                        <button onClick={() => setEmployeeToUpdate(id)}>Update</button>
+                        <button onClick={() => moreInfo(id)}>More Info</button>
+                        <button onClick={() => deleteEmployee(id)}>Delete</button>        
                     </td>
                   </tr>
                   )
@@ -120,7 +191,6 @@ const deleteEmployee = async (id) => {
                 </div>
                 <div>
                     <button type='submit'>{update ? 'Update' : 'Create'}</button>
-                    <button onClick={() => expandAllEmployees()}>{expand ? 'COLLAPSE ALL' : 'EXPAND ALL'}</button>
                 </div>
             </div>
         </form>

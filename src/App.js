@@ -1,6 +1,6 @@
 import { EmployeeTable } from "./components/EmployeeTable";
+import Header from "./components/Header";
 import { makeServer } from "./server";
-// import Expand from "./components/Expand";
 // import { useEffect, useState } from "react";
 
 if (process.env.NODE_ENV === "development") {
@@ -10,10 +10,10 @@ if (process.env.NODE_ENV === "development") {
 function App() {
 
   return (
-    <div>
-      <EmployeeTable />
-      {/* <Expand /> */}
-    </div>
+  <div>
+    <Header />
+    <EmployeeTable />
+  </div>
   );
 }
 export default App;
