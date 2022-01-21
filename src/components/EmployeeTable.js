@@ -1,7 +1,6 @@
 import Modal from "react-modal/lib/components/Modal"
 import { useState, useEffect } from "react"
 import React from "react"
-import { EmployeeForm } from "./EmployeeForm";
 // import { EmployeeForm } from "./EmployeeForm"
 
 const customStyles = {
@@ -22,7 +21,7 @@ const customStyles = {
   const avatarStyling = {
     height: '60px',
     width: '100'
-
+    
   }
 
 export function EmployeeTable() {
@@ -40,6 +39,7 @@ export function EmployeeTable() {
       .then(res => res.json())
       .then(json => setEmployees(json.employees)
       )
+      // console.log(expand)
     }, [])
 
     const expandAllEmployees = () => {
@@ -48,35 +48,36 @@ export function EmployeeTable() {
       } if(expand === true) {
         setExpand(false)
       }
+      console.log(expand)
     }
 
-//     const updateEmployee = async () => {
-//       try {
-//       const res = await fetch(`/api/employees/${employeeId}`, 
-//       {method: 'PATCH', body: JSON.stringify({firstName, lastName})})
-//       const json = await res.json()
+    const updateEmployee = async () => {
+      try {
+      const res = await fetch(`/api/employees/${employeeId}`, 
+      {method: 'PATCH', body: JSON.stringify({firstName, lastName})})
+      const json = await res.json()
 
-//       const employeesCopy = [...employees]
-//       const index = employees.findIndex((employee) => employee.id === employeeId)
-//       employeesCopy[index] = json.employee
+      const employeesCopy = [...employees]
+      const index = employees.findIndex((employee) => employee.id === employeeId)
+      employeesCopy[index] = json.employee
 
-//       setEmployees(employeesCopy)
-//       setFirstName('')
-//       setLastName('')
-//       setUpdate(false)
-//       setEmployeeId(null)
-//   } catch (err) {
-//       console.log(err)
-//   }
-// }
+      setEmployees(employeesCopy)
+      setFirstName('')
+      setLastName('')
+      setUpdate(false)
+      setEmployeeId(null)
+  } catch (err) {
+      console.log(err)
+  }
+}
 
-// const submitForm = async (event) => {
-//   event.preventDefault()
+const submitForm = async (event) => {
+  event.preventDefault()
 
-//   if(update){
-//       updateEmployee()
-//   }
-// }
+  if(update){
+      updateEmployee()
+  }
+}
     
   
 const deleteEmployee = async (id) => {
@@ -101,7 +102,19 @@ return (
   <div>
     <div>
       <>
-      <EmployeeForm />
+      <form onSubmit={submitForm}>
+        <div>
+          <div>
+             <input type="text" placeholder= 'First Name' value={firstName} onChange={e => setFirstName(e.target.value)}/>
+          </div>
+          <div>
+            <input type="text" placeholder='Last Name' value={lastName} onChange={e => setLastName(e.target.value)}/>
+          </div>
+          <div>
+            <button type='submit'>Submit</button>
+          </div>
+        </div>
+      </form>
       <button onClick={() => expandAllEmployees()}>{expand ? 'COLLAPSE ALL' : 'EXPAND ALL'}</button>
               <ul style={styleUl}>
                 {employees.map(e => (
@@ -112,7 +125,7 @@ return (
                   <button onClick={() => deleteEmployee(e.id)}>Delete</button>        
                   {expand === true ? (
 
-                        <ul style={styleUl}>
+                        <ul>
                         <li>{e.email}</li>
                         <li>{e.phone}</li>
                         <li>{e.address.streetAddress}</li>
