@@ -1,8 +1,8 @@
 import Modal from "react-modal/lib/components/Modal"
 import { useState, useEffect } from "react"
 import React from "react"
-// import { EmployeeForm } from "./EmployeeForm"
 
+//basic styling for Modal
 const customStyles = {
   content: {
     top: '50%',
@@ -20,12 +20,15 @@ const customStyles = {
 
   const avatarStyling = {
     height: '60px',
-    width: '100'
-    
+    width: '100',
+    cursor: 'pointer'
   }
 
 export function EmployeeTable() {
-    const [employees, setEmployees] = useState([])
+
+  ///// ALL STATE VARIABLES /////
+    
+  const [employees, setEmployees] = useState([])
     const [employeeId, setEmployeeId] = useState([])
     const [update, setUpdate] = useState(false)
     const [expand, setExpand] = useState(false)
@@ -33,13 +36,14 @@ export function EmployeeTable() {
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
     const [selectedEmployee, setSelectedEmployee] = useState('')
+    
+    /////// FUNCTIONS ////////
 
     useEffect(() => {
       fetch('/api/employees')
       .then(res => res.json())
       .then(json => setEmployees(json.employees)
       )
-      // console.log(expand)
     }, [])
 
     const expandAllEmployees = () => {
@@ -48,10 +52,10 @@ export function EmployeeTable() {
       } if(expand === true) {
         setExpand(false)
       }
-      console.log(expand)
     }
 
-    const updateEmployee = async () => {
+    // Fetch request to api to update employee name
+  const updateEmployee = async () => {
       try {
       const res = await fetch(`/api/employees/${employeeId}`, 
       {method: 'PATCH', body: JSON.stringify({firstName, lastName})})
@@ -71,6 +75,7 @@ export function EmployeeTable() {
   }
 }
 
+// Event handler to set state with udpated employee name
 const submitForm = async (event) => {
   event.preventDefault()
 
@@ -79,7 +84,7 @@ const submitForm = async (event) => {
   }
 }
     
-  
+// Delete Employee
 const deleteEmployee = async (id) => {
   try {
       await fetch(`/api/employees/${id}`, {method: 'DELETE'})
@@ -88,14 +93,16 @@ const deleteEmployee = async (id) => {
       
   }
 }
-    const setEmployeeToUpdate = (id) => {
-        const employee = employees.find(emp => emp.id === id)
-        if(!employee) return
-        setUpdate(true)
-        setEmployeeId(employee.id)
-        setFirstName(employee.firstName)
-        setLastName(employee.lastName)
-    }
+  
+// Update Employee
+const setEmployeeToUpdate = (id) => {
+    const employee = employees.find(emp => emp.id === id)
+    if(!employee) return
+    setUpdate(true)
+    setEmployeeId(employee.id)
+    setFirstName(employee.firstName)
+    setLastName(employee.lastName)
+  }
 
 
 return (
@@ -115,6 +122,7 @@ return (
           </div>
         </div>
       </form>
+      <p>(Click on an avatar image to expand that employee and see more info.)</p>
       <button onClick={() => expandAllEmployees()}>{expand ? 'COLLAPSE ALL' : 'EXPAND ALL'}</button>
               <ul style={styleUl}>
                 {employees.map(e => (
@@ -125,7 +133,7 @@ return (
                   <button onClick={() => deleteEmployee(e.id)}>Delete</button>        
                   {expand === true ? (
 
-                        <ul>
+                        <ul key={e.id} style={styleUl}>
                         <li>{e.email}</li>
                         <li>{e.phone}</li>
                         <li>{e.address.streetAddress}</li>
