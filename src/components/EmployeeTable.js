@@ -190,7 +190,7 @@ const deleteEmployee = async (id) => {
                 <input type="text" value={lastName} onChange={e => setLastName(e.target.value)}/>
                 </div>
                 <div>
-                    <button type='submit'>{update ? 'Update' : 'Create'}</button>
+                    <button type='submit'>{update ? 'Update' : ''}</button>
                 </div>
             </div>
         </form>
